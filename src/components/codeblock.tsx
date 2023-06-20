@@ -1,15 +1,14 @@
-// src/components/code.tsx
-'use client';
-
 import { StreamLanguage } from '@codemirror/language';
 import { go } from '@codemirror/legacy-modes/mode/go';
 import { aura } from '@uiw/codemirror-theme-aura';
 import CodeMirror from '@uiw/react-codemirror';
 import { FC, useEffect, useState } from 'react';
+import { FiCopy, FiCheck } from 'react-icons/fi';
 
 interface Props {
   code: string;
   editable?: boolean;
+  showCopy?: boolean;
   onChange?: (value: string) => void;
 }
 
@@ -17,44 +16,51 @@ const COPY_RESET_DELAY_MS = 2000;
 
 export const CodeBlock: FC<Props> = ({
   code,
-  editable = false,
-  onChange = () => {},
+  editable = true,
+  showCopy: showCopy = false,
+  onChange = () => { },
 }) => {
-  const [copyText, setCopyText] = useState<string>('Copy');
+  const [copySuccess, setCopySuccess] = useState<boolean>(false);
 
   useEffect(() => {
-    if (copyText === 'Copied!') {
+    if (copySuccess) {
       const timeout = setTimeout(() => {
-        setCopyText('Copy');
+        setCopySuccess(false);
       }, COPY_RESET_DELAY_MS);
 
       return () => clearTimeout(timeout);
     }
-  }, [copyText]);
+  }, [copySuccess]);
 
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(code);
-      setCopyText('Copied!');
+      setCopySuccess(true);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
   }
 
   return (
-    <div className="relative">
-      <button
-        aria-label="Copy code to clipboard"
-        className="absolute right-0 top-0 z-10 rounded bg-[#1A1B26] p-1 text-xs text-white hover:bg-[#2D2E3A] active:bg-[#2D2E3A]"
-        onClick={copyToClipboard}
-      >
-        {copyText}
-      </button>
+    <div className="relative w-full">
+      {showCopy ? (
+        <button
+          type='button'
+          aria-label="Copy code to clipboard"
+          className="absolute right-2 top-2 z-10 rounded bg-[#1A1B26] p-1 opacity-80 text-xs text-white hover:bg-[#2D2E3A] hover:opacity-90 active:bg-[#2D2E3A] active:opacity-90"
+          onClick={copyToClipboard}
+        >
+          {copySuccess ? <FiCheck color="green" /> : <FiCopy color="gray" />}
+
+        </button>
+      ) : null}
 
       <CodeMirror
         editable={editable}
         value={code}
-        minHeight="500px"
+        height="100%"
+        width='100%'
+        minHeight='100%'
         extensions={[StreamLanguage.define(go)]}
         theme={aura}
         onChange={onChange}

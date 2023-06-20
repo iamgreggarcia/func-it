@@ -12,7 +12,17 @@ module.exports = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      backdropBlur: {
+        'none': '0',
+        'blur': 'blur(2px)',
+        'blur-md': 'blur(4px)',
+        'blur-lg': 'blur(8px)',
+        'blur-xl': 'blur(12px)',
+        'blur-2xl': 'blur(16px)',
+        'blur-3xl': 'blur(24px)',
+      },
     },
+    
   },
   plugins: [],
 }

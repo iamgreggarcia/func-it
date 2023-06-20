@@ -10,6 +10,21 @@ enum InputLanguage {
 
 type OutputLanguage = string;
 
+const LANGUAGE_CONFIG = {
+    [InputLanguage.Natural]: {
+        type: 'Natural Language',
+        example: NATURAL_LANGUAGE_INPUT,
+    },
+    [InputLanguage.YAML]: {
+        type: 'openapi.yaml OpenAPI spec',
+        example: OPENAPI_YAML,
+    },
+    [InputLanguage.JSON]: {
+        type: 'openapi.json OpenAPI spec',
+        example: OPENAPI_JSON,
+    },
+}
+
 /**
 * Create a system prompt for generating function specifications for OpenAI's Chat Completions API.
 * @param inputLanguage - The language of the input code.
@@ -22,55 +37,32 @@ export const createSystemPrompt = (
     outputLanguage: OutputLanguage,
     inputCode: string,
 ): string => {
-    switch (inputLanguage) {
-        case InputLanguage.Natural:
-            // TODO: convert the user's natural language input into function parameter specs
+    const config = LANGUAGE_CONFIG[inputLanguage];
+    if (!config) throw new Error(`Unsupported input language: ${inputLanguage}`);
+    
+    return endent`
+        You are an expert software engineer with deep knowledge of all programming languages.
+        You are tasked with translating a ${config.type} into a functions array written in ${outputLanguage} (Do not include backticks \`\`\`)
+        for the OpenAI Chat Completions API functions parameter. Carefully read the following documentation and examples. 
+        Then respond to the PRODUCTION request.
+        DO NOT WRITE NATUARAL LANGUAGE UNLESS IT IS A CODE COMMENT. CODE ONLY.(Do not include backticks \`\`\`)
 
-            return endent`
-            You are an expert software engineer with meticulous attention to detail. 
-            You are tasked with translating natural language into a functions array written in "${outputLanguage}" (Do not include \`\`\`) for the OpenAI Chat Completions API functions parameter. 
+        ${OPENAI_FUNCTIONS_DEF}
 
-            "${OPENAI_FUNCTIONS_DEF}"
-            
-            Example translating natural language to functions array in python:
-            
-            Natural lanugage:
-            "${NATURAL_LANGUAGE_INPUT}"
+        Here is an EXAMPLE translating a ${config.type} to a Python array called "functions":
+        ---
+        ${config.type}:
+        ${config.example}
 
-            Python functions array code:
-            "${FUNCTIONS}"
+        Python functions array code:
+        ${FUNCTIONS}
+        ---
 
-            Natural language:
-            "${inputCode}"
+        Below is the PRODUCTION request: translate the ${config.type} into a functions array in ${outputLanguage} (Do not include backticks \`\`\`).
 
-            "${inputLanguage}" functions array code (no \`\`\`):
-            `;
-        case InputLanguage.YAML:
-            // TODO: Convert the openapi.yaml spec into function parameter specs
-            return endent`
-            You are an expert software engineer with meticulous attention to detail. 
-            You are tasked with translating an openapi.yaml OpenAPI spec into a functions array written in "${outputLanguage}" (Do not include \`\`\`) for the OpenAI Chat Completions API functions parameter. 
-            
-            "${OPENAI_FUNCTIONS_DEF}"
-            
-            Example translating openapi.yaml to functions array in python:
-            
-            Natural lanugage:
-            "${NATURAL_LANGUAGE_INPUT}"
+        ${config.type}:
+        ${inputCode}
 
-            Python functions array code:
-            "${FUNCTIONS}"
-
-            Natural language:
-            "${inputCode}"
-
-            "${inputLanguage}" functions array code (no \`\`\`):
-            `
-
-        case InputLanguage.JSON:
-            // TODO: Convert the openapi.json spec into function parameter specs
-            return endent`lorem ipsum`;
-        default:
-            throw new Error(`Unsupported input language: ${inputLanguage}`);
-    }
+        ${inputLanguage} functions array code (no \`\`\`). DO NOT WRITE NATUARAL LANGUAGE UNLESS IT IS A CODE COMMENT. CODE ONLY. (Do not include backticks \`\`\`)
+        `;
 };
