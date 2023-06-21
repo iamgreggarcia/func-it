@@ -16,22 +16,14 @@
   }
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-.bg-gradient {
-  background-image: linear-gradient(to bottom right, #515459, #164f66);
+  background-color: #2B2A3B;
 }
 
 /* Custom Scrollbar */
