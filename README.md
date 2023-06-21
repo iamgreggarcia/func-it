@@ -2,6 +2,8 @@
 
 Func-it translates API specifications into a properly formatted `functions` parameter for the OpenAI Chat Completions API. 
 
+![Demo gif of func-it](func-it_demo.gif)
+
 ## Quickstart
 
 1. Clone the repository and navigate into the directory:
